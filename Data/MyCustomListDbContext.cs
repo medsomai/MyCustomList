@@ -11,5 +11,6 @@ namespace MyCustomList.Data
         }
 
         public DbSet<Product> Products => Set<Product>();
+        public DbSet<MyProduct> MyProducts => Set<MyProduct>();
     }
 }

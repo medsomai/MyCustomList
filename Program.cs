@@ -31,7 +31,7 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<MyCustomListContext>();
     db.Database.EnsureCreated();
 }
-// CRUD
+// CRUD Products
 
 // GET all
 app.MapGet("/products", async (MyCustomListContext db) =>
@@ -45,9 +45,10 @@ app.MapGet("/products/{id}", async (int id, MyCustomListContext db) =>
 
 // GET by query string
 app.MapGet("/products/search", async (string? name, MyCustomListContext db) =>
-{
+{    
     var products = await db.Products
-        .Where(p => string.IsNullOrEmpty(name) || p.Name.Contains(name))
+        .Where(p => (string.IsNullOrEmpty(name) || p.Name.Contains(name)) &&
+                !db.MyProducts.Any(mp => mp.Id == p.Id))
         .ToListAsync();
     return Results.Ok(products);
 });
@@ -94,6 +95,65 @@ app.MapDelete("/products/{id}", async (int id, MyCustomListContext db) =>
     if (product is null) return Results.NotFound();
 
     db.Products.Remove(product);
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+
+// CRUD MyProducts
+// CRUD
+
+// GET all
+app.MapGet("/myproducts", async (MyCustomListContext db) =>
+    await db.MyProducts.ToListAsync());
+
+// GET by id
+app.MapGet("/myproducts/{id}", async (int id, MyCustomListContext db) =>
+    await db.MyProducts.FindAsync(id) is MyProduct product
+        ? Results.Ok(product)
+        : Results.NotFound());
+
+// POST create
+app.MapPost("/myproducts", async (ProductDto dto, MyCustomListContext db, IValidator<ProductDto> validator) =>
+{
+    var validationResult = await validator.ValidateAsync(dto);
+    if (!validationResult.IsValid)
+        return Results.ValidationProblem(validationResult.ToDictionary());
+
+    var product = new MyProduct
+    {
+        Name = dto.Name,
+        Description = dto.Description,
+        Price = dto.Price,
+        ImageUrl = dto.ImageUrl
+    };
+
+    db.MyProducts.Add(product);
+    await db.SaveChangesAsync();
+    return Results.Created($"/myproducts/{product.Id}", product);
+});
+
+// PUT update
+app.MapPut("/myproducts/{id}", async (int id, ProductDto dto, MyCustomListContext db, IValidator<ProductDto> validator) =>
+{
+    var validationResult = await validator.ValidateAsync(dto);
+    if (!validationResult.IsValid)
+        return Results.ValidationProblem(validationResult.ToDictionary());
+
+    var product = await db.MyProducts.FindAsync(id);
+    if (product is null) return Results.NotFound();
+
+    product.Name = dto.Name;
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+
+// DELETE
+app.MapDelete("/myproducts/{id}", async (int id, MyCustomListContext db) =>
+{
+    var product = await db.MyProducts.FindAsync(id);
+    if (product is null) return Results.NotFound();
+
+    db.MyProducts.Remove(product);
     await db.SaveChangesAsync();
     return Results.NoContent();
 });
