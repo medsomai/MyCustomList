@@ -43,6 +43,15 @@ app.MapGet("/products/{id}", async (int id, MyCustomListContext db) =>
         ? Results.Ok(product)
         : Results.NotFound());
 
+// GET by query string
+app.MapGet("/products/search", async (string? name, MyCustomListContext db) =>
+{
+    var products = await db.Products
+        .Where(p => string.IsNullOrEmpty(name) || p.Name.Contains(name))
+        .ToListAsync();
+    return Results.Ok(products);
+});
+
 // POST create
 app.MapPost("/products", async (ProductDto dto, MyCustomListContext db, IValidator<ProductDto> validator) =>
 {
@@ -69,7 +78,7 @@ app.MapPut("/products/{id}", async (int id, ProductDto dto, MyCustomListContext 
     var validationResult = await validator.ValidateAsync(dto);
     if (!validationResult.IsValid)
         return Results.ValidationProblem(validationResult.ToDictionary());
-        
+
     var product = await db.Products.FindAsync(id);
     if (product is null) return Results.NotFound();
 
