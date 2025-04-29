@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Ajouter EF Core avec SQLite
 builder.Services.AddDbContext<MyCustomListContext>(options =>
-    options.UseSqlite("Data Source=products.db"));
+    options.UseNpgsql("Host=dpg-d089s595pdvs739k4m10-a;Port=5432;Database=dbmycustomlist;Username=dbmycustomlist_user;Password=BkiOHbp1HXmcVGknJiggeKDxHM5S3A93;SSL Mode=Require;Trust Server Certificate=true;"));
 
 builder.Services.AddEndpointsApiExplorer(); // 👈 nécessaire pour Minimal API
 builder.Services.AddSwaggerGen();
