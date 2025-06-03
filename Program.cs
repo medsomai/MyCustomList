@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Ajouter EF Core avec SQLite
 builder.Services.AddDbContext<MyCustomListContext>(options =>
-    options.UseNpgsql("Host=dpg-d089s595pdvs739k4m10-a;Port=5432;Database=dbmycustomlist;Username=dbmycustomlist_user;Password=BkiOHbp1HXmcVGknJiggeKDxHM5S3A93;SSL Mode=Require;Trust Server Certificate=true;"));
+    options.UseNpgsql("Host=dpg-d0utn0euk2gs73aug580-a;Port=5432;Database=dbmycustomlist_0j50;Username=dbmycustomlist_user;Password=A1M9qOtjDmXwaMaUQJ11lYv5DlxJX7L7;SSL Mode=Require;Trust Server Certificate=true;"));
 
 builder.Services.AddEndpointsApiExplorer(); // 👈 nécessaire pour Minimal API
 builder.Services.AddSwaggerGen();
@@ -20,8 +20,8 @@ var app = builder.Build();
 
 // if (app.Environment.IsDevelopment())
 // {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+app.UseSwagger();
+app.UseSwaggerUI();
 // }
 
 
@@ -45,7 +45,7 @@ app.MapGet("/products/{id}", async (int id, MyCustomListContext db) =>
 
 // GET by query string
 app.MapGet("/products/search", async (string? name, MyCustomListContext db) =>
-{    
+{
     var products = await db.Products
         .Where(p => (string.IsNullOrEmpty(name) || p.Name.Contains(name)) &&
                 !db.MyProducts.Any(mp => mp.Id == p.Id))
