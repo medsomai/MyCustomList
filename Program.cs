@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Ajouter EF Core avec SQLite
 builder.Services.AddDbContext<MyCustomListContext>(options =>
-    options.UseNpgsql("Host=dpg-d0utn0euk2gs73aug580-a;Port=5432;Database=dbmycustomlist_0j50;Username=dbmycustomlist_user;Password=A1M9qOtjDmXwaMaUQJ11lYv5DlxJX7L7;SSL Mode=Require;Trust Server Certificate=true;"));
+    options.UseMySql("Server=sql7.freesqldatabase.com;Database=sql7782893;User=sql7782893;Password=Ly3ihfcxhY;",new MySqlServerVersion(new Version(8, 0, 25))));
 
 builder.Services.AddEndpointsApiExplorer(); // 👈 nécessaire pour Minimal API
 builder.Services.AddSwaggerGen();
